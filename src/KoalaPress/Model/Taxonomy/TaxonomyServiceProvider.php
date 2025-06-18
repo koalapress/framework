@@ -164,9 +164,7 @@ class TaxonomyServiceProvider extends ServiceProvider
     {
         $finder = fn() => ClassFinder::getClassesInNamespace('Theme\App\Model\Taxonomy');
 
-        return App::environment('development')
-            ? $finder()
-            : Cache::rememberForever('taxonomies', $finder);
+        return Cache::rememberForever('taxonomies', $finder);
     }
 
 }

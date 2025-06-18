@@ -2,6 +2,7 @@
 
 namespace KoalaPress\Model\PostType;
 
+use Composer\Autoload\ClassLoader;
 use Exception;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Support\Facades\App;
@@ -134,9 +135,7 @@ class PostTypeServiceProvider extends ServiceProvider
     {
         $finder = fn() => ClassFinder::getClassesInNamespace('Theme\App\Model\PostType');
 
-        return App::environment('development')
-            ? $finder()
-            : Cache::rememberForever('post_types', $finder);
+        return Cache::rememberForever('post_types', $finder);
     }
 
 }
