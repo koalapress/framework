@@ -5,6 +5,8 @@ namespace KoalaPress\Providers;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use KoalaPress\Model\PostType\PostTypeServiceProvider;
 use KoalaPress\Model\Taxonomy\TaxonomyServiceProvider;
+use KoalaPress\Template\TemplateServiceProvider;
+use KoalaPress\View\ViewServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -17,5 +19,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->app->register(PostTypeServiceProvider::class);
         $this->app->register(TaxonomyServiceProvider::class);
+        $this->app->register(TemplateServiceProvider::class);
+        $this->app->register(ViewServiceProvider::class);
     }
 }
