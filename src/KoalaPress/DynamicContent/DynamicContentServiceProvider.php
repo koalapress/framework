@@ -70,6 +70,11 @@ class DynamicContentServiceProvider extends ServiceProvider
         })->filter()->toArray();
     }
 
+    /**
+     * Get the layouts for the ACF field group.
+     *
+     * @return array
+     */
     private function getLayouts(): array
     {
         $modules = ModuleResolver::resolve();
@@ -87,9 +92,23 @@ class DynamicContentServiceProvider extends ServiceProvider
                             array(
                                 'key' => 'field_' . $key,
                                 'type' => 'clone',
-                                'required' => 1,
+                                'required' => 0,
                                 'clone' => array(
                                     $module::getFieldGroup(),
+                                ),
+                                'acfe_seamless_style' => 0,
+                                'acfe_clone_modal' => 0,
+                                'acfe_clone_modal_close' => 0,
+                                'acfe_clone_modal_button' => '',
+                                'acfe_clone_modal_size' => 'large',
+                            ),
+                            array(
+                                'key' => 'field_secition_options' . $key,
+                                'label' => 'Sektionsoptionen',
+                                'type' => 'clone',
+                                'required' => 0,
+                                'clone' => array(
+                                    'group_section_options',
                                 ),
                                 'acfe_seamless_style' => 0,
                                 'acfe_clone_modal' => 0,
