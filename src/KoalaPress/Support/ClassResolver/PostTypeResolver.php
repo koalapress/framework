@@ -2,11 +2,7 @@
 
 namespace KoalaPress\Support\ClassResolver;
 
-use HaydenPierce\ClassFinder\ClassFinder;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
-
-class PostTypeResolver
+class PostTypeResolver extends ClassResolver
 {
     /**
      * @var string The namespace to search for post type classes.

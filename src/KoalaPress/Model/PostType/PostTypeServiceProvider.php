@@ -37,13 +37,10 @@ class PostTypeServiceProvider extends ServiceProvider
     protected function registerPostTypes(): void
     {
         try {
-            #$classes = PostTypeResolver::resolve();
-            $classes =
-                collect(ClassFinder::getClassesInNamespace('Theme\\App\\Model\\PostType\\'));
+            $classes = PostTypeResolver::resolve();
 
             $classes->each(function ($class) {
                 $model = new $class();
-                dd($class);
 
                 if (post_type_exists($model->getPostType())) {
                     unregister_post_type($model->getPostType());

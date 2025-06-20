@@ -24,17 +24,39 @@ class DynamicContentServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        /*if(!function_exists('acf_add_local_field_group')) {
+        if (!function_exists('acf_add_local_field_group')) {
             return;
-        }*/
+        }
 
-        #$fieldGroup = include __DIR__ . DIRECTORY_SEPARATOR . 'fields' . DIRECTORY_SEPARATOR . 'group_dynamic-content.php';
+        $fieldGroup = include __DIR__ . DIRECTORY_SEPARATOR . 'fields' . DIRECTORY_SEPARATOR . 'group_dynamic-content.php';
 
-        #$postTypes = PostTypeResolver::resolve();
+        $fieldGroup['location'] = $this->getLocations();
 
-        /*$postTypes->each(function ($class) use ($fieldGroup) {
+        acf_add_local_field_group($fieldGroup);
+    }
+
+    /**
+     * Get the locations for the ACF field group.
+     *
+     * @return array
+     */
+    private function getLocations(): array
+    {
+        $postTypes = PostTypeResolver::resolve();
+
+        return $postTypes->map(function ($class) {
             $model = new $class();
-            dump($model->useDynamicContent);
-        });*/
+
+            if ($model->useDynamicContent) {
+                return [
+                    [
+                        'param' => 'post_type',
+                        'operator' => '==',
+                        'value' => $model->getPostType(),
+                    ]
+                ];
+            }
+            return null;
+        })->filter()->toArray();
     }
 }
