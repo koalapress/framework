@@ -8,6 +8,7 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use KoalaPress\Support\ClassResolver\PostTypeResolver;
 use PostTypes\PostType;
 
 class PostTypeServiceProvider extends ServiceProvider
@@ -36,10 +37,13 @@ class PostTypeServiceProvider extends ServiceProvider
     protected function registerPostTypes(): void
     {
         try {
-            $classes = $this->resolvePostTypes();
+            #$classes = PostTypeResolver::resolve();
+            $classes =
+                collect(ClassFinder::getClassesInNamespace('Theme\\App\\Model\\PostType\\'));
 
-            foreach ($classes as $class) {
+            $classes->each(function ($class) {
                 $model = new $class();
+                dd($class);
 
                 if (post_type_exists($model->getPostType())) {
                     unregister_post_type($model->getPostType());
@@ -119,23 +123,9 @@ class PostTypeServiceProvider extends ServiceProvider
 
                 $postType->register();
                 $postType->flush(true);
-            }
+            });
         } catch (Exception $e) {
             wp_die($e->getMessage());
         }
     }
-
-    /**
-     * Resolve Post Types
-     *
-     * @return array
-     * @throws Exception
-     */
-    protected function resolvePostTypes(): array
-    {
-        $finder = fn() => ClassFinder::getClassesInNamespace('Theme\App\Model\PostType');
-
-        return Cache::rememberForever('post_types', $finder);
-    }
-
 }

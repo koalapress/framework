@@ -7,6 +7,7 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use KoalaPress\Support\ClassResolver\TaxonomyResolver;
 use PostTypes\Taxonomy;
 
 class TaxonomyServiceProvider extends ServiceProvider
@@ -35,9 +36,9 @@ class TaxonomyServiceProvider extends ServiceProvider
     protected function registerTaxonomies(): void
     {
         try {
-            $classes = $this->resolveTaxonomies();
+            $classes = TaxonomyResolver::resolve();
 
-            foreach ($classes as $class) {
+            $classes->each(function ($class) {
                 $taxonomy = new $class();
 
                 $taxonomy->options['hierarchical'] = $taxonomy->hierarchical;
@@ -148,23 +149,9 @@ class TaxonomyServiceProvider extends ServiceProvider
                         );
                     });
                 }
-            }
+            });
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
-
-    /**
-     * Resolve Post Types
-     *
-     * @return array
-     * @throws Exception
-     */
-    protected function resolveTaxonomies(): array
-    {
-        $finder = fn() => ClassFinder::getClassesInNamespace('Theme\App\Model\Taxonomy');
-
-        return Cache::rememberForever('taxonomies', $finder);
-    }
-
 }
