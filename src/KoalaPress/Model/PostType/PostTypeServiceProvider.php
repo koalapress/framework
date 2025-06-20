@@ -2,10 +2,7 @@
 
 namespace KoalaPress\Model\PostType;
 
-use Composer\Autoload\ClassLoader;
 use Exception;
-use HaydenPierce\ClassFinder\ClassFinder;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use KoalaPress\Support\ClassResolver\PostTypeResolver;
@@ -38,8 +35,9 @@ class PostTypeServiceProvider extends ServiceProvider
     {
         try {
             $classes = PostTypeResolver::resolve();
+            $postTypeMatching = [];
 
-            $classes->each(function ($class) {
+            $classes->each(function ($class) use (&$postTypeMatching) {
                 $model = new $class();
 
                 if (post_type_exists($model->getPostType())) {
@@ -64,23 +62,23 @@ class PostTypeServiceProvider extends ServiceProvider
                 $postType->options($options);
                 $postType->labels($labels);
 
-                $postType->columns()->hide($model->admin_columns_hidden);
+                $postType->columns()->hide($model->adminColumnsHidden);
 
-                foreach ($model->admin_columns as $k => $v) {
+                foreach ($model->adminColumns as $k => $v) {
                     if (is_numeric($k)) {
-                        $model->admin_columns[$v] = ucfirst($v);
-                        unset($model->admin_columns[$k]);
+                        $model->adminColumns[$v] = ucfirst($v);
+                        unset($model->adminColumns[$k]);
                     }
                 }
 
-                $postType->columns()->add($model->admin_columns);
+                $postType->columns()->add($model->adminColumns);
 
                 $order['title'] = 1;
-                $idx = in_array('title', $model->admin_columns_hidden) ? 1 : 2;
+                $idx = in_array('title', $model->adminColumnsHidden) ? 1 : 2;
                 $order = [];
                 $sortable = [];
 
-                foreach ($model->admin_columns as $k => $v) {
+                foreach ($model->adminColumns as $k => $v) {
                     $postType->columns()->populate(
                         $k,
                         function ($column, $post_id) use ($class, $k) {
@@ -101,8 +99,8 @@ class PostTypeServiceProvider extends ServiceProvider
 
                 $postType->columns()->sortable($sortable);
 
-                if (in_array('title', $model->admin_columns_hidden)) {
-                    $keys = array_keys($model->admin_columns);
+                if (in_array('title', $model->adminColumnsHidden)) {
+                    $keys = array_keys($model->adminColumns);
                     $first_column = reset($keys);
                     add_filter(
                         'list_table_primary_column',
@@ -119,7 +117,12 @@ class PostTypeServiceProvider extends ServiceProvider
                 }
 
                 $postType->register();
-                $postType->flush(true);
+                $postType->flush();
+
+                $postTypeMatching[$model->getPostType()] = $class;
+            });
+            Cache::rememberForever('koalapress.post-types.matching', function () use ($postTypeMatching) {
+                return $postTypeMatching;
             });
         } catch (Exception $e) {
             wp_die($e->getMessage());

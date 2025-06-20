@@ -73,12 +73,12 @@ class Model extends Corcel
 	/**
 	 * Add custom columns to the admin table
 	 */
-	public array $admin_columns = [];
+	public array $adminColumns = [];
 
 	/**
 	 * Remove columns from the admin table
 	 */
-	public array $admin_columns_hidden = [];
+	public array $adminColumnsHidden = [];
 
 	/**
 	 * The post type

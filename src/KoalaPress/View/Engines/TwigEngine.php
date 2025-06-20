@@ -43,7 +43,6 @@ class TwigEngine extends PhpEngine {
      */
     public function get( $path, array $data = [] ): string
     {
-
         foreach ( $this->finder->getPaths() as $realpath ) {
             $pattern = '~^' . realpath( $realpath ) . '~';
             if ( preg_match( $pattern, $path ) ) {
@@ -55,6 +54,6 @@ class TwigEngine extends PhpEngine {
             $path .= $this->extension;
         }
 
-        return $this->environment->render( $path, $data );
+        return $this->environment->render( $path, $data[0] ); // TODO: Check if data[0] is correct. It seems like it should be $data instead.
     }
 }

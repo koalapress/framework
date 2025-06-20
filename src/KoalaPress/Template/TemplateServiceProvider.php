@@ -6,6 +6,7 @@ namespace KoalaPress\Template;
 use Brain\Hierarchy\Finder\ByFolders;
 use Brain\Hierarchy\QueryTemplate;
 use Illuminate\Support\ServiceProvider;
+use KoalaPress\Context\Context;
 use Throwable;
 
 class TemplateServiceProvider extends ServiceProvider
@@ -31,10 +32,14 @@ class TemplateServiceProvider extends ServiceProvider
 
             $queryTemplate = new QueryTemplate($finder);
             $template = $queryTemplate->findTemplate(null, false);
-            $view_name = basename($template, '.twig');
-            $view_name = basename($view_name, '.blade.php');
+            $viewName = basename($template, '.twig');
+            $viewName = basename($viewName, '.blade.php');
 
-            echo view('templates.' . $view_name)->render();
+            $context = new Context();
+
+            echo view('templates.' . $viewName, [
+                $context->getAll(),
+            ])->render();
 
             exit();
         });

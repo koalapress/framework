@@ -88,6 +88,14 @@ class TwigExtension extends AbstractExtension
                 function ($string) {
                     return sanitize_title($string);
                 }),
+            new TwigFilter('dump', function ($value) {
+                if (function_exists('dump')) {
+                    dump($value);
+                } else {
+                    var_dump($value);
+                }
+                return '';
+            }),
         ];
     }
 
