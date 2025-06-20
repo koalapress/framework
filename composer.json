@@ -28,7 +28,10 @@
     "autoload": {
         "psr-4": {
             "KoalaPress\\": "src/KoalaPress/"
-        }
+        },
+        "files": [
+            "src/KoalaPress/helpers.php"
+        ]
     },
     "config": {
         "allow-plugins": {

@@ -110,6 +110,9 @@ class TwigExtension extends AbstractExtension
             /*
              * WordPress theme functions.
              */
+            new TwigFunction('module', function ($name, $data = []) {
+                return module($name, $data);
+            }),
             new TwigFunction('wp_head', 'wp_head'),
             new TwigFunction('wp_footer', 'wp_footer'),
             new TwigFunction('body_class', function ($class = '') {

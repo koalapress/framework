@@ -23,7 +23,8 @@ class ViewServiceProvider extends ServiceProvider
             return new Environment($loader, [
                 'cache' => storage_path('framework/views/twig'),
                 'auto_reload' => !$app->environment('production'),
-                'debug' => $app->environment('local'),
+                'debug' => $app->environment('development'),
+                'autoescape' => false,
             ]);
         });
     }

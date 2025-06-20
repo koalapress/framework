@@ -80,7 +80,7 @@ class DynamicContentServiceProvider extends ServiceProvider
                 return [
                     $key => [
                         'key' => 'layout_' . $key,
-                        'name' => $module::getName(),
+                        'name' => $key,
                         'label' => $module::getLabel(),
                         'display' => 'block',
                         'sub_fields' => array(

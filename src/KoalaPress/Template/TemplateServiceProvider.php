@@ -37,9 +37,9 @@ class TemplateServiceProvider extends ServiceProvider
 
             $context = new Context();
 
-            echo view('templates.' . $viewName, [
+            echo view('templates.' . $viewName,
                 $context->getAll(),
-            ])->render();
+            )->render();
 
             exit();
         });

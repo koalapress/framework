@@ -4,6 +4,7 @@ namespace KoalaPress\DynamicContent;
 
 use Illuminate\Support\Str;
 use KoalaPress\Support\Helper\NamingHelper;
+use Throwable;
 
 class Module
 {
@@ -35,6 +36,25 @@ class Module
      * @see https://developer.wordpress.org/resource/dashicons/
      */
     public static string $icon = 'layout';
+
+    /**
+     * Module constructor.
+     *
+     * @param array $data
+     */
+    public function __construct(private array $data = [])
+    {
+    }
+
+    /**
+     * Get the data for the module.
+     *
+     * @return array
+     */
+    private function getData(): array
+    {
+        return $this->data;
+    }
 
     /**
      * Get the field group key for the ACF fields.
@@ -77,6 +97,28 @@ class Module
             className: static::class,
             prefix: 'Module'
         );
+    }
+
+    /**
+     * Get the view name for the module.
+     *
+     * @return string
+     */
+    public static function getViewName(): string
+    {
+        return 'module.' . Str::kebab(NamingHelper::getShortName(static::class));
+    }
+
+    /**
+     * Render the module view.
+     *
+     * @return string
+     * @throws Throwable
+     */
+    public function render(): string
+    {
+        return view(static::getViewName(), $this->getData())
+            ->render();
     }
 
 }

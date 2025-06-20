@@ -54,6 +54,6 @@ class TwigEngine extends PhpEngine {
             $path .= $this->extension;
         }
 
-        return $this->environment->render( $path, $data[0] ); // TODO: Check if data[0] is correct. It seems like it should be $data instead.
+        return $this->environment->render( $path, $data );
     }
 }

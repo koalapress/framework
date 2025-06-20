@@ -26,6 +26,7 @@ class Context
         return [
             'post' => $this->model,
             $this->model->getPostType() => $this->model,
+            'dynamic_content' => $this->model->dynamic_content ?? [],
         ];
     }
 }

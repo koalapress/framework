@@ -1,10 +1,8 @@
 <?php
 
 namespace KoalaPress\Model\Traits;
-use Themes\Smr\App\Casts\ACF;
-use Themes\Smr\Core\PostType\Taxonomy;
-
-use function KoalaPress\Model\PostType\Traits\get_fields;
+use KoalaPress\Model\Taxonomy\Model as Taxonomy;
+use KoalaPress\Model\Casts\ACF;
 
 trait HasACF
 {
