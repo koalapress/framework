@@ -30,16 +30,18 @@ class FlexibleContentServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->registerAcfLocations();
+        add_action('acf/init', function() {
+            $this->registerAcfLocations();
 
-        $fieldGroup = include __DIR__ . DIRECTORY_SEPARATOR . 'Acf' . DIRECTORY_SEPARATOR . 'Fields' . DIRECTORY_SEPARATOR . 'group_flexible-content.php';
+            $fieldGroup = include __DIR__ . DIRECTORY_SEPARATOR . 'Acf' . DIRECTORY_SEPARATOR . 'Fields' . DIRECTORY_SEPARATOR . 'group_flexible-content.php';
 
-        $fieldGroup['location'] = $this->getLocations();
-        $fieldGroup['fields']['main']['layouts'] = $this->getLayouts();
+            $fieldGroup['location'] = $this->getLocations();
+            $fieldGroup['fields']['main']['layouts'] = $this->getLayouts();
 
-        acf_add_local_field_group($fieldGroup);
+            acf_add_local_field_group($fieldGroup);
 
-        $this->addAcfeFlexibleLayout();
+            $this->addAcfeFlexibleLayout();
+        });
     }
 
     /**

@@ -9,12 +9,12 @@ class FlexibleContentRenderer
     /**
      * Render a flexible content field (ACF) as module views.
      *
-     * @param string|array $content ACF field name or flexible content array
+     * @param string|array|null $content ACF field name or flexible content array
      * @param int|null $postId Optional post ID if $content is a field name
      * @param string $viewPrefix View namespace (e.g. "module.")
      * @return string Rendered HTML
      */
-    public static function render(string|array $content, ?int $postId = null, string $viewPrefix = 'module.'): string
+    public static function render(string|array|null $content, ?int $postId = null, string $viewPrefix = 'module.'): string
     {
         // Allow passing flexible content array directly
         $layouts = is_array($content) ? $content : get_field($content, $postId ?? get_the_ID());

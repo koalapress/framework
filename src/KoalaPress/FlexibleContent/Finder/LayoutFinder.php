@@ -6,7 +6,12 @@ use Illuminate\Support\Str;
 
 class LayoutFinder
 {
-    static public function find()
+    /**
+     * Find and return the layouts for flexible content.
+     *
+     * @return array
+     */
+    static public function find(): array
     {
         $fieldGroups = collect(acf_get_field_groups());
 

@@ -13,4 +13,14 @@ class PostTypeResolver extends ClassResolver
      * @var string The cache key for storing resolved post type classes.
      */
     protected static string $cacheKey = 'koalapress.post-types';
+
+    /**
+     * Get the namespace for post type classes.
+     *
+     * @return string
+     */
+    protected static function getNamespace(): string
+    {
+        return app()->getNamespace() . 'Model\PostType';
+    }
 }

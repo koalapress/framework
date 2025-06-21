@@ -23,6 +23,11 @@ class GlobalComposer extends Composer
     public function with(): array
     {
         $queried = get_queried_object();
+
+        if (!$queried || !isset($queried->post_type) || !isset($queried->ID)) {
+            return [];
+        }
+
         $matching = Cache::get('koalapress.post-types.matching', []);
 
         $modelClass = $matching[$queried->post_type] ?? Model::class;
