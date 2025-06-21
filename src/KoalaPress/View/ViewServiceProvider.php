@@ -2,15 +2,16 @@
 
 namespace KoalaPress\View;
 
-use Illuminate\Support\ServiceProvider;
+use KoalaPress\View\Composers\GlobalComposer;
 use KoalaPress\View\Engines\TwigEngine;
 use KoalaPress\View\Extensions\TwigExtension;
 use KoalaPress\View\Loader\TwigLoader;
 use Roots\Acorn\View\FileViewFinder;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
+use Roots\Acorn\View\ViewServiceProvider as BaseViewServiceProvider;
 
-class ViewServiceProvider extends ServiceProvider
+class ViewServiceProvider extends BaseViewServiceProvider
 {
     /**
      * Register the service provider.
@@ -29,6 +30,7 @@ class ViewServiceProvider extends ServiceProvider
             ]);
         });
         $this->registerViewFinder();
+        $this->registerComposers();
     }
 
     /**
@@ -45,7 +47,6 @@ class ViewServiceProvider extends ServiceProvider
         // register twig extensions
         $this->app['twig']->addExtension(new DebugExtension());
         $this->app['twig']->addExtension(new TwigExtension($this->app));
-
     }
 
     /**
@@ -53,15 +54,16 @@ class ViewServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function registerViewFinder()
+    public function registerViewFinder(): void
     {
         $this->app->bind('view.finder', function ($app) {
-            $finder = new FileViewFinder($app['files'], array_unique($app['config']['view.paths']), ['twig', 'blade.php', 'php']);
+            $finder = new FileViewFinder($app['files'], array_unique($app['config']['view.paths']),
+                ['twig', 'blade.php', 'php']);
 
             foreach ($app['config']['view.namespaces'] as $namespace => $hints) {
                 $hints = array_merge(
-                    array_map(fn ($path) => "{$path}/vendor/{$namespace}", $finder->getPaths()),
-                    (array) $hints
+                    array_map(fn($path) => "{$path}/vendor/{$namespace}", $finder->getPaths()),
+                    (array)$hints
                 );
 
                 $finder->addNamespace($namespace, $hints);
@@ -71,5 +73,15 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         $this->app->alias('view.finder', FileViewFinder::class);
+    }
+
+    /**
+     * Register view composers.
+     *
+     * @return void
+     */
+    public function registerComposers(): void
+    {
+        $this->view()->composer(GlobalComposer::views(), GlobalComposer::class);
     }
 }
