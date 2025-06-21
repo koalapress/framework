@@ -10,7 +10,6 @@
         }
     ],
     "require": {
-        "brain/hierarchy": "^3.2",
         "haydenpierce/class-finder": "^0.5.3",
         "jgrossi/corcel": "^9.0",
         "jjgrainger/posttypes": "^2.2",

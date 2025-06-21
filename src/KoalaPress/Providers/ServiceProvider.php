@@ -6,8 +6,8 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use KoalaPress\DynamicContent\DynamicContentServiceProvider;
 use KoalaPress\Model\PostType\PostTypeServiceProvider;
 use KoalaPress\Model\Taxonomy\TaxonomyServiceProvider;
-use KoalaPress\Template\TemplateServiceProvider;
 use KoalaPress\View\ViewServiceProvider;
+use Roots\Acorn\Sage\SageServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -18,9 +18,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
+        $this->app->register(SageServiceProvider::class);
         $this->app->register(PostTypeServiceProvider::class);
         $this->app->register(TaxonomyServiceProvider::class);
-        $this->app->register(TemplateServiceProvider::class);
         $this->app->register(ViewServiceProvider::class);
         $this->app->register(DynamicContentServiceProvider::class);
     }

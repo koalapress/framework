@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use KoalaPress\View\Engines\TwigEngine;
 use KoalaPress\View\Extensions\TwigExtension;
 use KoalaPress\View\Loader\TwigLoader;
+use Roots\Acorn\View\FileViewFinder;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 
@@ -27,6 +28,7 @@ class ViewServiceProvider extends ServiceProvider
                 'autoescape' => false,
             ]);
         });
+        $this->registerViewFinder();
     }
 
     /**
@@ -44,5 +46,30 @@ class ViewServiceProvider extends ServiceProvider
         $this->app['twig']->addExtension(new DebugExtension());
         $this->app['twig']->addExtension(new TwigExtension($this->app));
 
+    }
+
+    /**
+     * Register View Finder
+     *
+     * @return void
+     */
+    public function registerViewFinder()
+    {
+        $this->app->bind('view.finder', function ($app) {
+            $finder = new FileViewFinder($app['files'], array_unique($app['config']['view.paths']), ['twig', 'blade.php', 'php']);
+
+            foreach ($app['config']['view.namespaces'] as $namespace => $hints) {
+                $hints = array_merge(
+                    array_map(fn ($path) => "{$path}/vendor/{$namespace}", $finder->getPaths()),
+                    (array) $hints
+                );
+
+                $finder->addNamespace($namespace, $hints);
+            }
+
+            return $finder;
+        });
+
+        $this->app->alias('view.finder', FileViewFinder::class);
     }
 }
