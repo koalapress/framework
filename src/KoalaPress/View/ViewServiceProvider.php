@@ -26,7 +26,6 @@ class ViewServiceProvider extends BaseViewServiceProvider
                 'cache' => storage_path('framework/views/twig'),
                 'auto_reload' => !$app->environment('production'),
                 'debug' => $app->environment('development'),
-                'autoescape' => false,
             ]);
         });
         $this->registerViewFinder();

@@ -1,6 +1,6 @@
 <?php
 
-namespace KoalaPress\DynamicContent;
+namespace KoalaPress\FlexibleContent;
 
 use Illuminate\Support\Str;
 use KoalaPress\Support\Helper\NamingHelper;

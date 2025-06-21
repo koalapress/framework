@@ -49,11 +49,11 @@ class Model extends Corcel
 	public string $icon = 'editor-quote';
 
     /**
-     * Will this post type use dynamic content?
+     * Will this post type use flexible content?
      *
      * @var bool
      */
-    public $useDymamicContent = false;
+    public $useFlexibleContent = false;
 
 	/**
 	 * Names for the post type @see https://posttypes.jjgrainger.co.uk/post-types/create-a-post-type

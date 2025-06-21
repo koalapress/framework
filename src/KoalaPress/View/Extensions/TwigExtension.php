@@ -3,6 +3,7 @@
 namespace KoalaPress\View\Extensions;
 
 use Illuminate\Contracts\Foundation\Application;
+use KoalaPress\FlexibleContent\FlexibleContentRenderer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -110,12 +111,18 @@ class TwigExtension extends AbstractExtension
             /*
              * WordPress theme functions.
              */
-            new TwigFunction('module', function ($name, $data = []) {
-                return module($name, $data);
-            }),
-            new TwigFunction('asset', function ($name) {
-                return asset($name);
-            }),
+            new TwigFunction('view', function ($name, $data = []) {
+                return view($name, $data);
+            }, [
+                'is_safe' => ['html'],
+            ]),
+            new TwigFunction('flexible',
+                fn($fieldOrArray, $postId = null) => FlexibleContentRenderer::render($fieldOrArray),
+                [
+                    'is_safe' => ['html']
+                ]
+            ),
+            new TwigFunction('asset', 'asset'),
             new TwigFunction('wp_head', 'wp_head'),
             new TwigFunction('wp_footer', 'wp_footer'),
             new TwigFunction('body_class', function ($class = '') {

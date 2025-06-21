@@ -3,7 +3,7 @@
 namespace KoalaPress\Providers;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use KoalaPress\DynamicContent\DynamicContentServiceProvider;
+use KoalaPress\FlexibleContent\FlexibleContentServiceProvider;
 use KoalaPress\Model\PostType\PostTypeServiceProvider;
 use KoalaPress\Model\Taxonomy\TaxonomyServiceProvider;
 use KoalaPress\View\ViewServiceProvider;
@@ -22,6 +22,6 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->register(PostTypeServiceProvider::class);
         $this->app->register(TaxonomyServiceProvider::class);
         $this->app->register(ViewServiceProvider::class);
-        $this->app->register(DynamicContentServiceProvider::class);
+        $this->app->register(FlexibleContentServiceProvider::class);
     }
 }

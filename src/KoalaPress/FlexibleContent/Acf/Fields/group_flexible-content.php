@@ -1,12 +1,12 @@
 <?php
 
 return array(
-    'key' => 'group_dynamic-content',
-    'title' => 'Dynamischer Inhalt',
+    'key' => 'group_flexible-content',
+    'title' => 'Flexibler Inhalt',
     'fields' => array(
         'main' => array(
-            'key' => 'field_dynamic_content',
-            'name' => 'dynamic_content',
+            'key' => 'field_flexible_content',
+            'name' => 'flexible_content',
             'aria-label' => '',
             'type' => 'flexible_content',
             'instructions' => 'Bitte wählen Sie hier die dynamischen Inhalt aus, die auf dieser Seite erscheinen sollen.',
