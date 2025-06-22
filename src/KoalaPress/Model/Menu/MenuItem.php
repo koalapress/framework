@@ -8,7 +8,6 @@ use Corcel\Model\Page;
 use Corcel\Model\Post;
 use Corcel\Model\Taxonomy;
 use Illuminate\Support\Arr;
-use ReflectionException;
 use WP_Error;
 use WP_Post;
 
@@ -23,16 +22,15 @@ class MenuItem extends \Corcel\Model\MenuItem
      * @var array
      */
     protected $instanceRelations = [
-    'post' => Post::class,
-    'page' => Page::class,
-    'custom' => CustomLink::class,
-    'category' => Taxonomy::class,
+        'post' => \KoalaPress\Model\PostType\Model::class,
+        'page' => \KoalaPress\Model\PostType\Model::class,
+        'custom' => CustomLink::class,
+        'category' => Taxonomy::class,
     ];
 
     /**
      * MenuItem constructor.
      *
-     * @throws ReflectionException
      */
     public function __construct(array $attributes = [])
     {
@@ -46,7 +44,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     {
         $post = \wp_setup_nav_menu_item(\get_post($this->meta->_menu_item_object_id));
 
-        $items = [ $post ];
+        $items = [$post];
 
         \_wp_menu_item_classes_by_context($items);
 
@@ -101,7 +99,7 @@ class MenuItem extends \Corcel\Model\MenuItem
             case 'taxonomy':
                 $tax = $this->instance()->toArray();
 
-                return \get_term_link((int) $tax['term_taxonomy_id'], $tax['taxonomy']);
+                return \get_term_link((int)$tax['term_taxonomy_id'], $tax['taxonomy']);
                 break;
 
             case 'custom':
@@ -135,7 +133,7 @@ class MenuItem extends \Corcel\Model\MenuItem
             case 'taxonomy':
                 $tax = $this->instance()->toArray();
 
-                return \get_term_field('name', (int) $tax['term_taxonomy_id'], $tax['taxonomy'], 'raw');
+                return \get_term_field('name', (int)$tax['term_taxonomy_id'], $tax['taxonomy'], 'raw');
                 break;
 
             case 'post_type_archive':
@@ -179,7 +177,7 @@ class MenuItem extends \Corcel\Model\MenuItem
             }
 
             if (get_option('link_overview_' . $context['post']->postType)) {
-                return (int) get_option('link_overview_' . $context['post']->postType) === $id;
+                return (int)get_option('link_overview_' . $context['post']->postType) === $id;
             }
         }
 

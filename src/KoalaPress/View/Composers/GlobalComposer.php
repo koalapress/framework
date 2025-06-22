@@ -4,6 +4,7 @@ namespace KoalaPress\View\Composers;
 
 use Illuminate\Support\Facades\Cache;
 use KoalaPress\Model\PostType\Model;
+use KoalaPress\Support\ModelResolver\PostTypeResolver;
 use Roots\Acorn\View\Composer;
 
 class GlobalComposer extends Composer
@@ -28,9 +29,7 @@ class GlobalComposer extends Composer
             return [];
         }
 
-        $matching = Cache::get('koalapress.post-types.matching', []);
-
-        $modelClass = $matching[$queried->post_type] ?? Model::class;
+        $modelClass = PostTypeResolver::resolve($queried->post_type);
 
         $model = $modelClass::find($queried->ID);
 
