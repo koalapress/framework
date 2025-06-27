@@ -86,4 +86,34 @@ class Model extends Menu
             'object_id'
         )->orderBy('menu_order');
     }
+
+    /**
+     * Recursively transform a menu item and its children.
+     *
+     * @param $item
+     * @return array
+     */
+    protected function transformMenuItem($item)
+    {
+        return [
+            'title' => $item->title,
+            'url' => $item->url,
+            'target' => $item->target,
+            'children' => $item->children
+                ? $item->children->map(fn($child) => $this->transformMenuItem($child))->toArray()
+                : [],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function nestify(): array
+    {
+        return $this->items()
+            ->get()
+            ->filter(fn($item) => $item->parent() === null)
+            ->map(fn($item) => $this->transformMenuItem($item))
+            ->toArray() ?? [];
+    }
 }

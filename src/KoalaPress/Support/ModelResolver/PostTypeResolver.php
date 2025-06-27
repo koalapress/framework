@@ -3,6 +3,7 @@
 namespace KoalaPress\Support\ModelResolver;
 
 use Illuminate\Support\Facades\Cache;
+use KoalaPress\Model\PostType\Model;
 
 class PostTypeResolver
 {
@@ -21,6 +22,6 @@ class PostTypeResolver
         if (isset($postTypes[$postType])) {
             return $postTypes[$postType];
         }
-        return 'KoalaPress\\Model\\PostType\\Model';
+        return Model::class;
     }
 }

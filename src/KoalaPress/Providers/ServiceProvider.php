@@ -7,6 +7,7 @@ use KoalaPress\FlexibleContent\FlexibleContentServiceProvider;
 use KoalaPress\Model\Menu\MenuServiceProvider;
 use KoalaPress\Model\PostType\PostTypeServiceProvider;
 use KoalaPress\Model\Taxonomy\TaxonomyServiceProvider;
+use KoalaPress\Support\ModelResolver\ModelResolver;
 use KoalaPress\View\ViewServiceProvider;
 use Roots\Acorn\Sage\SageServiceProvider;
 
@@ -25,5 +26,22 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->register(MenuServiceProvider::class);
         $this->app->register(ViewServiceProvider::class);
         $this->app->register(FlexibleContentServiceProvider::class);
+    }
+
+    /**
+     * Bootstrap the service provider.
+     *
+     * @return void
+     */
+    public function boot(): void
+    {
+        add_action('wp', function () {
+            $post = ModelResolver::findFromQuery();
+
+            view()->share([
+                'post' => $post,
+                $post ? strtolower(class_basename($post)) : 'model' => $post,
+            ]);
+        });
     }
 }

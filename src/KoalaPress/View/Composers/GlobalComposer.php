@@ -2,9 +2,6 @@
 
 namespace KoalaPress\View\Composers;
 
-use Illuminate\Support\Facades\Cache;
-use KoalaPress\Model\PostType\Model;
-use KoalaPress\Support\ModelResolver\PostTypeResolver;
 use Roots\Acorn\View\Composer;
 
 class GlobalComposer extends Composer
@@ -23,19 +20,11 @@ class GlobalComposer extends Composer
      */
     public function with(): array
     {
-        $queried = get_queried_object();
-
-        if (!$queried || !isset($queried->post_type) || !isset($queried->ID)) {
-            return [];
-        }
-
-        $modelClass = PostTypeResolver::resolve($queried->post_type);
-
-        $model = $modelClass::find($queried->ID);
+        $post = view()->shared('post');
 
         return [
-            'post' => $model,
-            $model->getPostType() => $model,
+            'post' => $post ?: null,
+            $post ? strtolower(class_basename($post)) : 'model' => $post,
         ];
     }
 }

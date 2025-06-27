@@ -3,8 +3,6 @@
 namespace KoalaPress\Model\Taxonomy;
 
 use Exception;
-use HaydenPierce\ClassFinder\ClassFinder;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use KoalaPress\Support\ClassResolver\TaxonomyResolver;
@@ -37,8 +35,9 @@ class TaxonomyServiceProvider extends ServiceProvider
     {
         try {
             $classes = TaxonomyResolver::resolve();
+            $taxonomyMatching = [];
 
-            $classes->each(function ($class) {
+            $classes->each(function ($class) use (&$taxonomyMatching) {
                 $taxonomy = new $class();
 
                 $taxonomy->options['hierarchical'] = $taxonomy->hierarchical;
@@ -129,7 +128,8 @@ class TaxonomyServiceProvider extends ServiceProvider
                                     'koalapress-taxonomy-' . $me->getTaxonomy(),
                                     $me->names['singular'],
                                     function ($wp_post) use ($me, $post_types) {
-                                        $tax = \KoalaPress\Model\PostType\Model::find($wp_post->ID)->taxonomies()->where('taxonomy', '=', $me->getTaxonomy())->first();
+                                        $tax = \KoalaPress\Model\PostType\Model::find($wp_post->ID)->taxonomies()->where('taxonomy',
+                                            '=', $me->getTaxonomy())->first();
 
                                         $args = [
                                             'taxonomy' => $me->getTaxonomy(),
@@ -149,6 +149,11 @@ class TaxonomyServiceProvider extends ServiceProvider
                         );
                     });
                 }
+
+                $taxonomyMatching[$taxonomy->getTaxonomy()] = $class;
+            });
+            Cache::rememberForever('koalapress.taxonomy.matching', function () use ($taxonomyMatching) {
+                return $taxonomyMatching;
             });
         } catch (Exception $e) {
             throw new Exception($e->getMessage());

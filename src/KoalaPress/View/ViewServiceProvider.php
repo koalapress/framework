@@ -28,6 +28,7 @@ class ViewServiceProvider extends BaseViewServiceProvider
                 'debug' => $app->environment('development'),
             ]);
         });
+
         $this->registerViewFinder();
         $this->registerComposers();
     }
@@ -46,6 +47,7 @@ class ViewServiceProvider extends BaseViewServiceProvider
         // register twig extensions
         $this->app['twig']->addExtension(new DebugExtension());
         $this->app['twig']->addExtension(new TwigExtension($this->app));
+        $this->registerComposers();
     }
 
     /**
