@@ -50,7 +50,6 @@ class LayoutFinder
                         'required' => 0,
                         'clone' => [
                             $fieldGroup['key'],
-                            'group_section_options',
                         ],
                         'acfe_seamless_style' => 0,
                         'acfe_clone_modal' => 0,
