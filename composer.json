@@ -40,7 +40,8 @@
     "extra": {
         "acorn": {
             "providers": [
-                "KoalaPress\\Providers\\ServiceProvider"
+                "KoalaPress\\Providers\\ServiceProvider",
+                "KoalaPress\\Image\\ImageServiceProvider"
             ]
         }
     }

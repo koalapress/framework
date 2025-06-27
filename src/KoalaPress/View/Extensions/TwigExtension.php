@@ -122,6 +122,10 @@ class TwigExtension extends AbstractExtension
                     'is_safe' => ['html']
                 ]
             ),
+            new TwigFunction('source_set', function () {
+                return app('image')->getSourceset(...func_get_args());
+            }),
+            new TwigFunction('url', 'url'),
             new TwigFunction('asset', 'asset'),
             new TwigFunction('wp_head', 'wp_head'),
             new TwigFunction('wp_footer', 'wp_footer'),
