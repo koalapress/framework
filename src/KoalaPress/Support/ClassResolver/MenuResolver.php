@@ -2,12 +2,10 @@
 
 namespace KoalaPress\Support\ClassResolver;
 
+use KoalaPress\Model\Menu\Model;
+
 class MenuResolver extends ClassResolver
 {
-    /**
-     * @var string The namespace to search for post type classes.
-     */
-    protected static string $namespace = 'Theme\App\Model\Menu';
 
     /**
      * @var string The cache key for storing resolved post type classes.
@@ -15,12 +13,12 @@ class MenuResolver extends ClassResolver
     protected static string $cacheKey = 'koalapress.menus';
 
     /**
-     * Get the namespace for post type classes.
-     *
-     * @return string
+     * @var string The directory where menu classes are located.
      */
-    protected static function getNamespace(): string
-    {
-        return app()->getNamespace() . 'Model\Menu';
-    }
+    protected static string $dir = 'Model/Menu';
+
+    /**
+     * @var string The base class that all post type classes should extend.
+     */
+    protected static string $subclassOf = Model::class;
 }

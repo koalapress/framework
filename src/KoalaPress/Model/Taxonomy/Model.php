@@ -5,6 +5,7 @@ namespace KoalaPress\Model\Taxonomy;
 use Corcel\Model\Taxonomy as Corcel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use KoalaPress\Model\Traits\DefaultOrderBy;
 use KoalaPress\Model\Traits\ForwardsNamedCalls;
 use KoalaPress\Model\Traits\HasACF;
 use KoalaPress\Model\Traits\HasAdminColumns;
@@ -15,6 +16,7 @@ class Model extends Corcel
     use ForwardsNamedCalls;
     use HasAdminColumns;
     use HasACF;
+    use DefaultOrderBy;
 
     /**
      * Names for the post taxonomy @see https://posttypes.jjgrainger.co.uk/taxonomies/create-a-taxonomy
