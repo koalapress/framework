@@ -5,11 +5,11 @@ namespace KoalaPress\Model\PostType;
 use Carbon\Carbon;
 use Corcel\Model\Post as Corcel;
 use Illuminate\Support\Facades\Cache;
+use KoalaPress\Model\Traits\DefaultOrderBy;
 use KoalaPress\Model\Traits\ForwardsNamedCalls;
 use KoalaPress\Model\Traits\HasACF;
 use KoalaPress\Model\Traits\HasAdminColumns;
 use ReflectionClass;
-use Stephenjude\DefaultModelSorting\Traits\DefaultOrderBy;
 
 
 class Model extends Corcel
