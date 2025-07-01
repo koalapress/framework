@@ -4,6 +4,7 @@ namespace KoalaPress\Model\Menu;
 
 use Corcel\Model\Builder\TaxonomyBuilder;
 use Corcel\Model\Menu;
+use Illuminate\Support\Collection;
 
 class Model extends Menu
 {
@@ -93,12 +94,13 @@ class Model extends Menu
      * @param $item
      * @return array
      */
-    protected function transformMenuItem($item)
+    protected function transformMenuItem($item): array
     {
         return [
             'title' => $item->title,
             'url' => $item->url,
             'target' => $item->target,
+            'classes' => $item->classes,
             'children' => $item->children
                 ? $item->children->map(fn($child) => $this->transformMenuItem($child))->toArray()
                 : [],
@@ -108,12 +110,11 @@ class Model extends Menu
     /**
      * @return array
      */
-    public function nestify(): array
+    public function nestify(): Collection
     {
         return $this->items()
             ->get()
             ->filter(fn($item) => $item->parent() === null)
-            ->map(fn($item) => $this->transformMenuItem($item))
-            ->toArray() ?? [];
+            ->map(fn($item) => $this->transformMenuItem($item)) ?? collect([]);
     }
 }

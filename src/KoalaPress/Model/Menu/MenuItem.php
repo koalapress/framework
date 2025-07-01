@@ -7,6 +7,7 @@ use Corcel\Model\Meta\PostMeta;
 use Corcel\Model\Page;
 use Corcel\Model\Post;
 use Corcel\Model\Taxonomy;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Arr;
 use WP_Error;
 use WP_Post;
@@ -40,7 +41,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return array|mixed|WP_Post|null
      */
-    private function get_wp_post_classes()
+    private function getWpPostClasses()
     {
         $post = \wp_setup_nav_menu_item(\get_post($this->meta->_menu_item_object_id));
 
@@ -56,7 +57,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return Post|Page|CustomLink|Taxonomy
      */
-    public function parent()
+    public function parent(): Taxonomy|CustomLink|Page|Post|null
     {
         if ($className = $this->getClassName()) {
             return (new $className())->newQuery()
@@ -69,7 +70,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return Post|Page|CustomLink|Taxonomy
      */
-    public function instance()
+    public function instance(): Taxonomy|CustomLink|Page|Post|null
     {
         if ($className = $this->getClassName()) {
             return (new $className())->newQuery()
@@ -82,7 +83,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return string
      */
-    protected function getClassName()
+    protected function getClassName(): string
     {
         return Arr::get(
             $this->instanceRelations,
@@ -93,7 +94,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return false|mixed|string|WP_Error
      */
-    public function getUrlAttribute()
+    public function getUrlAttribute(): mixed
     {
         switch ($this->_menu_item_type) {
             case 'taxonomy':
@@ -119,7 +120,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return int|mixed|string|WP_Error|null
      */
-    public function getTitleAttribute()
+    public function getTitleAttribute(): mixed
     {
         if ($this->post_title) {
             return $this->post_title;
@@ -150,9 +151,9 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return mixed
      */
-    public function getCurrentAttribute()
+    public function getCurrentAttribute(): mixed
     {
-        $post = $this->get_wp_post_classes();
+        $post = $this->getWpPostClasses();
 
         return $post->current;
     }
@@ -160,7 +161,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return mixed
      */
-    public function getCurrentItemParentAttribute()
+    public function getCurrentItemParentAttribute(): mixed
     {
         $context = $GLOBALS['sloth::plugin']->getContext();
 
@@ -181,7 +182,7 @@ class MenuItem extends \Corcel\Model\MenuItem
             }
         }
 
-        $post = $this->get_wp_post_classes();
+        $post = $this->getWpPostClasses();
 
         return $post->current_item_parent;
     }
@@ -189,9 +190,9 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return mixed
      */
-    public function getCurrentItemAncestorAttribute()
+    public function getCurrentItemAncestorAttribute(): mixed
     {
-        $post = $this->get_wp_post_classes();
+        $post = $this->getWpPostClasses();
 
         return $post->current_item_ancestor;
     }
@@ -199,7 +200,7 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return bool
      */
-    public function getInCurrentPathAttribute()
+    public function getInCurrentPathAttribute(): bool
     {
         return $this->getCurrentAttribute() || $this->getCurrentItemParentAttribute();
     }
@@ -207,9 +208,9 @@ class MenuItem extends \Corcel\Model\MenuItem
     /**
      * @return string
      */
-    public function getClassesAttribute()
+    public function getClassesAttribute(): string
     {
-        $post = $this->get_wp_post_classes();
+        $post = $this->getWpPostClasses();
 
         $classes = $post->classes;
 
@@ -230,9 +231,9 @@ class MenuItem extends \Corcel\Model\MenuItem
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasManyThrough
      */
-    public function children()
+    public function children(): HasManyThrough
     {
         return $this->hasManyThrough(
             MenuItem::class,
