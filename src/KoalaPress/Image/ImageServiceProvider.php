@@ -46,18 +46,27 @@ class ImageServiceProvider extends ServiceProvider
 
         if ($imageRatios != null && is_array($imageRatios)) {
             foreach ($imageRatios as $key => $imageSize) {
+                $i = 0;
                 $imageWidths = config('image-sizes.widths', []);
 
+                rsort($imageWidths);
 
                 foreach ($imageWidths as $imageWidth) {
                     if ($imageWidth > $imageSize['maxWidth']) {
                         continue;
                     }
 
-                    $calculatedImageSizes[$key . '_' . $imageWidth] = [
+                    $sizeKey = $key;
+
+                    if($i > 0) {
+                        $sizeKey .= '_' . $imageWidth;
+                    }
+
+                    $calculatedImageSizes[$sizeKey] = [
                         'width' => $imageWidth,
                         'height' => isset($imageSize['width']) ? (int)round($imageWidth / $imageSize['width'] * $imageSize['height']) : null
                     ];
+                    $i++;
                 }
             }
         }

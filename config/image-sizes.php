@@ -28,21 +28,25 @@ return [
             'width' => 16,
             'height' => 9,
             'maxWidth' => 2560,
+            'crop' => true,
         ],
         '4x3' => [
             'width' => 4,
             'height' => 3,
             'maxWidth' => 2560,
+            'crop' => true,
         ],
         '1x1' => [
             'width' => 1,
             'height' => 1,
             'maxWidth' => 1920,
+            'crop' => true,
         ],
         'variable' => [
             'width' => 2,
             'height' => null,
             'maxWidth' => 2560,
+            'crop' => false,
         ],
     ],
     /**
