@@ -129,6 +129,8 @@ class TwigExtension extends AbstractExtension
             new TwigFunction('asset', 'asset'),
             new TwigFunction('wp_head', 'wp_head'),
             new TwigFunction('wp_footer', 'wp_footer'),
+            new TwigFunction('bloginfo', 'bloginfo'),
+            new TwigFunction('language_attributes', 'language_attributes'),
             new TwigFunction('body_class', function ($class = '') {
                 return body_class($class);
             }),
