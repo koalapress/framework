@@ -16,6 +16,10 @@ class FlexibleContentRenderer
      */
     public static function render(string|array|null $content, ?int $postId = null, string $viewPrefix = 'module.'): string
     {
+        if(!function_exists('get_field')) {
+            return '<!-- ACF function get_field() not available. Ensure ACF is installed and activated. -->';
+        }
+
         // Allow passing flexible content array directly
         $layouts = is_array($content) ? $content : get_field($content, $postId ?? get_the_ID());
 
