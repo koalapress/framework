@@ -150,16 +150,18 @@ abstract class AbstractPluginsManagerInterface implements PluginsManagerInterfac
         });
 
         // Remove plugins that are no longer required
-        $dirs = collect($this->fs->directories($this->targetPath()));
 
-        $dirs->each(function ($dir) use ($required) {
-            $slug = basename($dir);
-            $marker = $dir . '/' . $this->markerFile;
+        if ($this->fs->isDirectory($this->targetPath())) {
+            $dirs = collect($this->fs->directories($this->targetPath()));
+            $dirs->each(function ($dir) use ($required) {
+                $slug = basename($dir);
+                $marker = $dir . '/' . $this->markerFile;
 
-            if ($this->fs->exists($marker) && !$required->has($slug)) {
-                $this->fs->deleteDirectory($dir);
-            }
-        });
+                if ($this->fs->exists($marker) && !$required->has($slug)) {
+                    $this->fs->deleteDirectory($dir);
+                }
+            });
+        }
     }
 
     /**
