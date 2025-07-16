@@ -35,6 +35,10 @@ class PluginsManagerServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->publishes([
+            __DIR__ . '/../../../config/plugins-manager.php' => $this->app->configPath('plugins-manager.php'),
+        ], 'config');
+
         add_action('init', function () {
             $plugins = new PluginsManager();
             $plugins->sync();
