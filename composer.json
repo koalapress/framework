@@ -20,7 +20,8 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.47",
-        "spatie/laravel-ignition": "^2.9"
+        "spatie/laravel-ignition": "^2.9",
+        "pestphp/pest": "^3.8"
     },
     "minimum-stability": "stable",
     "autoload": {
@@ -31,9 +32,13 @@
             "src/KoalaPress/helpers.php"
         ]
     },
+    "scripts": {
+        "test": "pest"
+    },
     "config": {
         "allow-plugins": {
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "pestphp/pest-plugin": true
         }
     },
     "extra": {
