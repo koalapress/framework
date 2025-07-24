@@ -16,6 +16,15 @@ function module($name, $args = [])
         '</div>';
 }
 
+function contents(string $asset, ?string $manifest = null): string
+{
+    if (!$manifest) {
+        return \app('assets.manifest')->asset($asset)->contents();
+    }
+
+    return \app('assets')->manifest($manifest)->asset($asset)->contents();
+}
+
 
 /** * Generate an image source set for responsive images.
  *
