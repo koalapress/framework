@@ -127,6 +127,10 @@ class TwigExtension extends AbstractExtension
             }),
             new TwigFunction('url', 'url'),
             new TwigFunction('asset', 'asset'),
+            new TwigFunction('contents', 'contents',
+                [
+                    'is_safe' => ['html']
+                ]),
             new TwigFunction('wp_head', 'wp_head'),
             new TwigFunction('wp_footer', 'wp_footer'),
             new TwigFunction('bloginfo', 'bloginfo'),
