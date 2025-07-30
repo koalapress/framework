@@ -16,6 +16,7 @@ use KoalaPress\AcfExtended\AcfExtendedServiceProvider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Roots\Acorn\Sage\SageServiceProvider;
+use KoalaPress\Acf\AcfServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -35,6 +36,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->register(PluginsManagerServiceProvider::class);
         $this->app->register(AdminCustomizerServiceProvider::class);
         $this->app->register(AcfExtendedServiceProvider::class);
+        $this->app->register(AcfServiceProvider::class);
     }
 
     /**
