@@ -23,6 +23,7 @@ class FlexibleContentServiceProvider extends ServiceProvider
      * Boot the service provider.
      *
      * @return void
+     * @throws \ReflectionException
      */
     public function boot(): void
     {
@@ -48,6 +49,7 @@ class FlexibleContentServiceProvider extends ServiceProvider
      * Get the locations for the ACF field group.
      *
      * @return array
+     * @throws \ReflectionException
      */
     private function getLocations(): array
     {

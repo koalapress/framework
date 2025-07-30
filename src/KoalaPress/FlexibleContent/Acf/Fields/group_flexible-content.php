@@ -51,10 +51,10 @@ return array(
     'style' => 'default',
     'label_placement' => 'top',
     'instruction_placement' => 'label',
-    'hide_on_screen' => array(
-        0 => 'block_editor',
-        1 => 'the_content',
-    ),
+    'hide_on_screen' => [
+        'block_editor',
+        'the_content',
+    ],
     'active' => true,
     'description' => 'Bitte wählen Sie einen dynamischen Inhalt aus, um ihn hinzuzufügen.',
     'show_in_rest' => 0,

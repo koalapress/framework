@@ -30,7 +30,7 @@ class FlexibleContentLocation extends ACF_Location
 	{
 		$values = [];
 
-		$values['section'] = __('Use as section');
+		$values['section'] = __('Use as module');
 		$values['section_options'] = __('Use as section options');
 
 		return array_unique($values);
