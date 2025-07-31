@@ -5,6 +5,7 @@ namespace KoalaPress\Providers;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use KoalaPress\AdminCustomizer\AdminCustomizerServiceProvider;
+use KoalaPress\Debugger\DebuggerServiceProvider;
 use KoalaPress\FlexibleContent\FlexibleContentServiceProvider;
 use KoalaPress\Model\Menu\MenuServiceProvider;
 use KoalaPress\Model\PostType\PostTypeServiceProvider;
@@ -37,6 +38,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->register(AdminCustomizerServiceProvider::class);
         $this->app->register(AcfExtendedServiceProvider::class);
         $this->app->register(AcfServiceProvider::class);
+        $this->app->register(DebuggerServiceProvider::class);
     }
 
     /**

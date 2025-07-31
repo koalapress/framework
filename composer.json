@@ -16,7 +16,8 @@
         "stephenjude/default-model-sorting": "^4.0",
         "illuminate/auth": "^12.18",
         "roots/acorn-prettify": "^1.0",
-        "twig/twig": "^3.21"
+        "twig/twig": "^3.21",
+        "tracy/tracy": "^2.10"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.47",
