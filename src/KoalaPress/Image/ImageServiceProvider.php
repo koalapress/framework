@@ -3,6 +3,7 @@
 namespace KoalaPress\Image;
 
 use Illuminate\Support\ServiceProvider;
+use Tracy\Debugger;
 
 class ImageServiceProvider extends ServiceProvider
 {
@@ -29,8 +30,19 @@ class ImageServiceProvider extends ServiceProvider
         $this->registerImageSizes();
 
         $this->app->singleton('image', function () {
-            return new Image();
+            return new ImageHelper();
         });
+
+        add_filter('wp_update_attachment_metadata', function ($metadata, $attachment_id) {
+            $image = new Image($attachment_id, $metadata);
+            $image->generateCrops();
+            return $metadata;
+        }, 8, 2);
+
+        add_filter('delete_attachment', function ($attachment_id) {
+            $image = new Image($attachment_id);
+            $image->delete();
+        }, 8, 1);
     }
 
     /**
@@ -58,7 +70,7 @@ class ImageServiceProvider extends ServiceProvider
 
                     $sizeKey = $key;
 
-                    if($i > 0) {
+                    if ($i > 0) {
                         $sizeKey .= '_' . $imageWidth;
                     }
 

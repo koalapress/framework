@@ -2,82 +2,104 @@
 
 namespace KoalaPress\Image;
 
+use Illuminate\Support\Facades\Storage;
+use Spatie\Image\Image as SpatieImage;
+use Tracy\Debugger;
+
 class Image
 {
-    public function getSourceset($image = null, $size = 'variable', $lazyload = false): ?array
+    protected $id;
+    protected $filename;
+    protected $metadata;
+    protected $file;
+    protected $folder;
+    protected $crops_folder;
+    protected $disk;
+
+    public const IMAGE_EXTENSION = 'avif';
+
+    public function __construct($id, $metadata = null)
     {
-        // todo: get default size from config
-        // todo: move $lazyload to view?
-
-        if (is_numeric($image) || is_string($image)) {
-            $image = acf_get_attachment($image);
+        if ($id === null) {
+            throw new \InvalidArgumentException('Image ID cannot be null');
         }
 
-        if (!$image || !isset($image['filename'])) {
-            return [];
+        $this->id = $id;
+
+        $upload_dir = \wp_upload_dir();
+        $this->disk = Storage::build([
+          'driver' => 'local',
+          'root' => $upload_dir['basedir'],
+          'url' => $upload_dir['baseurl'],
+        ]);
+
+        $this->getImageMetadata($metadata);
+        $this->getImageData();
+
+        if (!$this->disk->exists($this->file)) {
+            throw new \RuntimeException('Image not found in storage: ' . $this->file);
+        }
+    }
+
+    public function generateCrops()
+    {
+        if (count(\wp_get_missing_image_subsizes($this->id))) {
+            return;
         }
 
-        if (str_ends_with($image['filename'], '.svg')) {
-            $svg = simplexml_load_file(wp_get_original_image_path($image['id']));
+        $this->delete();
 
-            if ($svg) {
-                $width = (int)explode(' ', $svg->attributes()->viewBox)[2];
-                $height = (int)explode(' ', $svg->attributes()->viewBox)[3];
+        $sizes = \wp_get_additional_image_sizes();
 
-                if ($width == 0) {
-                    $width = (int)$svg->attributes()->width;
-                    $height = (int)$svg->attributes()->height;
-                }
+        $widths = config('image-sizes.responsive.widths', []);
 
-                if ($width > 0 && $height > 0) {
-                    $ratioPadding = ($height / $width) * 100;
+        if (empty($widths)) {
+            throw new \RuntimeException('No responsive image widths configured');
+        }
+
+        $this->disk->makeDirectory($this->crops_folder, 0777);
+
+        foreach ($sizes as $key => $size) {
+            foreach ($widths as $width) {
+                if ($size['width'] >= $width || config('image-sizes.responsive.upscale', false)) {
+                    SpatieImage::load($this->disk->path($this->file))
+                        ->width($width)
+                        ->save($this->getCropFilePath($key, $width));
                 }
             }
-
-            return [
-                'ratio' => number_format($ratioPadding ?? 100, 2, '.', ','),
-                'caption' => $image['caption'],
-                'alt' => $image['alt'] ?: get_bloginfo('name') . ' – ' . get_bloginfo('description'),
-                'src' => $image['url'],
-                'thumb' => $image['url'],
-                'lazyload' => $lazyload,
-                'width' => $width ?? '100%',
-                'height' => $height ?? 'auto',
-            ];
         }
+    }
 
-        $ratio = explode('x', $size);
+    public function delete()
+    {
+        $this->disk->deleteDirectory($this->crops_folder);
+    }
 
-        if ($size === 'variable') { // todo: get from config
-            $ratioPadding = $image['width'] != 0 ? ($image['height'] / $image['width']) * 100 : 0;
-        } else {
-            $ratioPadding = ($ratio[1] / $ratio[0]) * 100;
+    protected function getCropFilePath($size, $width)
+    {
+        return \wp_upload_dir()['basedir'] . '/' . $this->crops_folder . '/' . $this->filename . '-' . $size . '-' . $width . '.' . self::IMAGE_EXTENSION;
+    }
+
+    public function getUrl()
+    {
+        return $this->disk->url($this->file);
+    }
+
+    protected function getImageMetadata($metadata)
+    {
+        $metadata = $metadata ?? \wp_get_attachment_metadata($this->id);
+        if (!$metadata) {
+            throw new \RuntimeException('Image metadata not found for ID: ' . $this->id);
         }
+        $this->metadata = $metadata;
+    }
 
-        $imageSizes = $image['sizes'];
-
-        $imageBySize = array_filter($imageSizes, function ($k) use ($size, $image) {
-            return preg_match('/^' . $size . '/', $k) && !preg_match('/(-width|-height)/i', $k) && (int)explode('_',
-                    $k)[1] <= $image['width'];
-        }, ARRAY_FILTER_USE_KEY);
-
-        $srcSet = implode(', ', array_map(
-            function ($v, $k) use ($image) {
-                return sprintf('%s %sw', $v, explode('_', $k)[1]);
-            },
-            $imageBySize,
-            array_keys($imageBySize)
-        ));
-
-        return [
-            'ratio' => number_format($ratioPadding, 2, '.', ','),
-            'srcset' => $srcSet,
-            'caption' => $image['caption'],
-            'alt' => $image['alt'] ?: get_bloginfo('name') . ' – ' . get_bloginfo('description'),
-            'src' => $imageBySize[array_key_last($imageBySize)],
-            'lazyload' => $lazyload,
-            'width' => $image['width'] && $size === 'variable' ? $image['width'] : '100%',
-            'height' => $image['height'] && $size === 'variable' ? $image['height'] : 'auto',
-        ];
+    protected function getImageData()
+    {
+        $this->file = $this->metadata['file'];
+        $image_info = pathinfo($this->file);
+        $this->filename = $image_info['filename'];
+        $this->folder = $image_info['dirname'];
+        $this->crops_folder = $this->folder . '/' . $this->id;
     }
 }

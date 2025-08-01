@@ -17,6 +17,7 @@ class DebuggerServiceProvider extends ServiceProvider
         $mode = !app()->isProduction() ?
             Debugger::Development :
             Debugger::Production;
+
         Debugger::enable($mode);
     }
 }

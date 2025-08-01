@@ -1,4 +1,5 @@
 <?php
+
 // add image sizes here
 // they will be automatically calculated by imageWidths and added to the theme
 // if you lower the max width value all bigger sizes will be omitted
@@ -62,5 +63,28 @@ return [
         1600,
         1920,
         2560,
+    ],
+    /**
+     * Define responsive image settings.
+     * These will be used to generate responsive image crops.
+     */
+    'responsive' => [
+        /**
+         * Define the widths for generating the responsive webp images.
+         */
+        'widths' => [
+            64,
+            320,
+            640,
+            960,
+            1280,
+            1600,
+            1920,
+            2560,
+        ],
+        /**
+         * Allow upscaling of images.
+         */
+        'upscale' => false,
     ],
 ];
