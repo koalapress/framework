@@ -11,6 +11,7 @@ use KoalaPress\Model\Menu\MenuServiceProvider;
 use KoalaPress\Model\PostType\PostTypeServiceProvider;
 use KoalaPress\Model\Taxonomy\TaxonomyServiceProvider;
 use KoalaPress\PluginsManager\PluginsManagerServiceProvider;
+use KoalaPress\ResponsiveImage\ResponsiveImageServiceProvider;
 use KoalaPress\Support\ModelResolver\ModelResolver;
 use KoalaPress\View\ViewServiceProvider;
 use KoalaPress\AcfExtended\AcfExtendedServiceProvider;
@@ -39,6 +40,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->register(AcfExtendedServiceProvider::class);
         $this->app->register(AcfServiceProvider::class);
         $this->app->register(DebuggerServiceProvider::class);
+        $this->app->register(ResponsiveImageServiceProvider::class);
     }
 
     /**
