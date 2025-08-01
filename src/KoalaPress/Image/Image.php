@@ -4,17 +4,20 @@ namespace KoalaPress\Image;
 
 use Illuminate\Support\Facades\Storage;
 use Spatie\Image\Image as SpatieImage;
+use Spatie\Image\Enums\Fit;
 use Tracy\Debugger;
 
 class Image
 {
     protected $id;
     protected $filename;
+    protected $basename;
     protected $metadata;
     protected $file;
     protected $folder;
     protected $crops_folder;
     protected $disk;
+    protected $allSizes;
 
     public const IMAGE_EXTENSION = 'avif';
 
@@ -22,6 +25,14 @@ class Image
     {
         if ($id === null) {
             throw new \InvalidArgumentException('Image ID cannot be null');
+        }
+
+        if (empty(config('image-sizes.responsive.widths', []))) {
+            throw new \RuntimeException('No responsive image widths configured');
+        }
+
+        if (empty(config('image-sizes.sizes', []))) {
+            throw new \RuntimeException('No responsive image sizes configured');
         }
 
         $this->id = $id;
@@ -35,6 +46,7 @@ class Image
 
         $this->getImageMetadata($metadata);
         $this->getImageData();
+        $this->getAllSizes();
 
         if (!$this->disk->exists($this->file)) {
             throw new \RuntimeException('Image not found in storage: ' . $this->file);
@@ -48,26 +60,41 @@ class Image
         }
 
         $this->delete();
+        $this->disk->makeDirectory($this->crops_folder);
 
-        $sizes = \wp_get_additional_image_sizes();
+        foreach ($this->allSizes as $sizeInfo) {
+            if (!$sizeInfo['generate_crops']) {
+                continue;
+            }
 
-        $widths = config('image-sizes.responsive.widths', []);
-
-        if (empty($widths)) {
-            throw new \RuntimeException('No responsive image widths configured');
-        }
-
-        $this->disk->makeDirectory($this->crops_folder, 0777);
-
-        foreach ($sizes as $key => $size) {
-            foreach ($widths as $width) {
-                if ($size['width'] >= $width || config('image-sizes.responsive.upscale', false)) {
-                    SpatieImage::load($this->disk->path($this->file))
-                        ->width($width)
-                        ->save($this->getCropFilePath($key, $width));
-                }
+            foreach ($sizeInfo['crops'] as $crop) {
+                $this->generateCrop($sizeInfo['file_src'], $crop['width'], $crop['height'], $crop['file']);
             }
         }
+    }
+
+    public function getSrcset($sizeName = 'full')
+    {
+        if (!isset($this->allSizes[$sizeName])) {
+            throw new \InvalidArgumentException('Image size not found: ' . $sizeName);
+        }
+
+        $sizeInfo = $this->allSizes[$sizeName];
+
+        return collect($sizeInfo['crops'])
+            ->map(function ($crop) {
+                if ($crop['upscaled'] && !config('image-sizes.responsive.upscale', false)) {
+                    return;
+                }
+                return $this->disk->url($crop['file']) . ' ' . $crop['width'] . 'w';
+            })
+            ->filter()
+            ->implode(', ');
+    }
+
+    public function getUrl()
+    {
+        return $this->disk->url($this->file);
     }
 
     public function delete()
@@ -75,14 +102,67 @@ class Image
         $this->disk->deleteDirectory($this->crops_folder);
     }
 
-    protected function getCropFilePath($size, $width)
+    protected function generateCrop($src_file, $width, $height, $destination)
     {
-        return \wp_upload_dir()['basedir'] . '/' . $this->crops_folder . '/' . $this->filename . '-' . $size . '-' . $width . '.' . self::IMAGE_EXTENSION;
+        if ($src_file === null) {
+            return;
+        }
+
+        SpatieImage::load($this->disk->path($src_file))
+            ->fit(Fit::Crop, $width, $height)
+            ->optimize()
+            ->save($this->disk->path($destination));
     }
 
-    public function getUrl()
+    protected function getAllSizes()
     {
-        return $this->disk->url($this->file);
+        $expectedSizes = ['full'];
+        $expectedSizes += \get_intermediate_image_sizes();
+        $expectedSizes = array_unique($expectedSizes);
+        $full_was_generated = false;
+
+        $sizes = [];
+
+        foreach ($expectedSizes as $size) {
+            $file_src = $this->folder . '/' . ($this->metadata['sizes'][$size]['file'] ?? $this->basename);
+            $use_full = $size === 'full' || !isset($this->metadata['sizes'][$size]['file']);
+            $generate_crops = $use_full && !$full_was_generated || !$use_full;
+
+            $configured_size = config('image-sizes.sizes.' . $size, [
+                'width' => $this->metadata['width'],
+                'height' => $this->metadata['height'],
+                'crop' => true,
+            ]);
+
+            $ratio = $configured_size['height'] / $configured_size['width'];
+
+            $crops = collect(config('image-sizes.responsive.widths', []))
+                ->map(function ($width) use ($size, $use_full, $ratio) {
+                    return [
+                      'file' => $this->getCropFilePath($use_full ? 'full' : $size, $width),
+                      'width' => $width,
+                      'height' => (int)round($width * $ratio),
+                      'upscaled' => $width > $this->metadata['width'],
+                    ];
+                });
+
+            $sizes[$size] = [
+              'file_src' => $file_src,
+              'crops' => $crops->toArray(),
+              'generate_crops' => $generate_crops,
+            ];
+
+            if ($use_full) {
+                $full_was_generated = true;
+            }
+        }
+
+        $this->allSizes = $sizes;
+    }
+
+    protected function getCropFilePath($size, $width)
+    {
+        return $this->crops_folder . '/' . $this->filename . '-' . $size . '-' . $width . '.' . self::IMAGE_EXTENSION;
     }
 
     protected function getImageMetadata($metadata)
@@ -99,6 +179,7 @@ class Image
         $this->file = $this->metadata['file'];
         $image_info = pathinfo($this->file);
         $this->filename = $image_info['filename'];
+        $this->basename = $image_info['basename'];
         $this->folder = $image_info['dirname'];
         $this->crops_folder = $this->folder . '/' . $this->id;
     }
