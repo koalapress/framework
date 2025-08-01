@@ -27,19 +27,13 @@ class AcfExtendedServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-        $resolver = function() {
-            return app()->basePath('app/ACF/FieldGroups');
-        };
-
-        add_filter(
+        add_filters([
             'acfe/settings/php_save',
-            $resolver,
-            10);
-
-        add_filter(
             'acfe/settings/php_load',
-            $resolver,
+        ],
+            function () {
+                return app()->basePath('app/ACF/FieldGroups');
+            },
             10);
     }
 }

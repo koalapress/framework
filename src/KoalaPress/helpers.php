@@ -34,3 +34,19 @@ function source_set(): array
 {
     return app(Image::class)->getSourceset(...func_get_args());
 }
+
+if(!function_exists('add_filters')) {
+    /**
+     * Add filters to the WordPress filter system.
+     *
+     * @param array $filters An array of filters to add.
+     * @param callable $callback The callback function for the filters.
+     * @param int $priority The priority of the filters.
+     */
+    function add_filters(array $filters, callable $callback, int $priority = 10)
+    {
+        foreach ($filters as $filter) {
+            add_filter($filter, $callback, $priority);
+        }
+    }
+}
