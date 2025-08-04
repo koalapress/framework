@@ -92,6 +92,15 @@ class Image
             ->implode(', ');
     }
 
+    public function getAspectRatio($sizeName = 'full')
+    {
+        if (!isset($this->allSizes[$sizeName])) {
+            throw new \InvalidArgumentException('Image size not found: ' . $sizeName);
+        }
+
+        return $this->allSizes[$sizeName]['css_ratio'];
+    }
+
     public function getUrl()
     {
         return $this->disk->url($this->file);
@@ -116,43 +125,49 @@ class Image
 
     protected function getAllSizes()
     {
-        $expectedSizes = ['full'];
-        $expectedSizes += \get_intermediate_image_sizes();
-        $expectedSizes = array_unique($expectedSizes);
-        $full_was_generated = false;
+        $expectedSizes['full'] = [
+          'width' => $this->metadata['width'],
+          'height' => $this->metadata['height'],
+        ];
+        $expectedSizes = array_merge(
+            $expectedSizes,
+            \wp_get_attachment_metadata($this->id)['sizes'] ?? [],
+            \wp_get_additional_image_sizes()
+        );
+        $expectedSizes = collect($expectedSizes)
+            ->map(function ($size_info, $size_name) {
+                return [
+                    'file_src' => $this->folder . '/' . ($this->metadata['sizes'][$size_name]['file'] ?? $this->basename),
+                    'width' => $size_info['width'],
+                    'height' => $size_info['height'],
+                    'ratio' => $size_info['height'] / $size_info['width'],
+                    'use_full' => $size_name === 'full' || !isset($this->metadata['sizes'][$size_name]['file']),
+                ];
+            })
+            ->toArray();
 
+        $full_was_generated = false;
         $sizes = [];
 
-        foreach ($expectedSizes as $size) {
-            $file_src = $this->folder . '/' . ($this->metadata['sizes'][$size]['file'] ?? $this->basename);
-            $use_full = $size === 'full' || !isset($this->metadata['sizes'][$size]['file']);
-            $generate_crops = $use_full && !$full_was_generated || !$use_full;
-
-            $configured_size = config('image-sizes.sizes.' . $size, [
-                'width' => $this->metadata['width'],
-                'height' => $this->metadata['height'],
-                'crop' => true,
-            ]);
-
-            $ratio = $configured_size['height'] / $configured_size['width'];
-
+        foreach ($expectedSizes as $size => $size_info) {
             $crops = collect(config('image-sizes.responsive.widths', []))
-                ->map(function ($width) use ($size, $use_full, $ratio) {
+                ->map(function ($width) use ($size, $size_info) {
                     return [
-                      'file' => $this->getCropFilePath($use_full ? 'full' : $size, $width),
+                      'file' => $this->getCropFilePath($size_info['use_full'] ? 'full' : $size, $width),
                       'width' => $width,
-                      'height' => (int)round($width * $ratio),
-                      'upscaled' => $width > $this->metadata['width'],
+                      'height' => (int)round($width * $size_info['ratio']),
+                      'upscaled' => $width > $size_info['width'],
                     ];
                 });
 
             $sizes[$size] = [
-              'file_src' => $file_src,
+              'file_src' => $size_info['file_src'],
               'crops' => $crops->toArray(),
-              'generate_crops' => $generate_crops,
+              'css_ratio' => '1 / ' . $size_info['ratio'],
+              'generate_crops' => $size_info['use_full'] && !$full_was_generated || !$size_info['use_full'],
             ];
 
-            if ($use_full) {
+            if ($size_info['use_full']) {
                 $full_was_generated = true;
             }
         }
