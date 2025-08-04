@@ -6,6 +6,11 @@ use KoalaPress\Model\Casts\ACF;
 
 trait HasACF
 {
+    /**
+     * Cache for ACF fields to avoid multiple calls to get_fields
+     *
+     * @var array
+     */
     protected static array $acfFieldCache = [];
 
     /**
@@ -13,7 +18,7 @@ trait HasACF
      */
     public function initializeHasACF(): void
     {
-        self::retrieved(function ($model) {
+        self::retrieved(function () {
             $key = $this->getAcfKey();
             if (!isset(self::$acfFieldCache[$key])) {
                 self::$acfFieldCache[$key] = collect(get_fields($key) ?? [])->keys();
